@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Результаты Матрицы</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button onclick="goBack()">← Назад</button>
+    <h1>Расчёт Матрицы</h1>
+  </header>
+
+  <main>
+    <div class="large-label">Дата рождения: <span id="birthDate"></span></div>
+    <div class="large-label">Технический расклад: <span id="technicalLayout"></span></div>
+
+    <div class="grid">
+      <!-- 1 4 7 -->
+      <div class="cell">
+        <div class="label">Характер</div>
+        <div id="1" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Здоровье</div>
+        <div id="4" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Счастье</div>
+        <div id="7" class="number">–</div>
+      </div>
+    
+      <!-- 2 5 8 -->
+      <div class="cell">
+        <div class="label">Энергия</div>
+        <div id="2" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Сердечность</div>
+        <div id="5" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Удача</div>
+        <div id="8" class="number">–</div>
+      </div>
+    
+      <!-- 3 6 9 -->
+      <div class="cell">
+        <div class="label">Талант</div>
+        <div id="3" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Труд</div>
+        <div id="6" class="number">–</div>
+      </div>
+      <div class="cell">
+        <div class="label">Память</div>
+        <div id="9" class="number">–</div>
+      </div>
+    </div>
+    
+  </main>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+
+    // Получаем дату рождения из localStorage
+    const birthDate = localStorage.getItem('birthdate');  // Для теста установим дату
+
+    // Форматируем дату в формат dd.mm.yyyy
+    const formattedDate = birthDate.replace(/\//g, '.');
+    document.getElementById('birthDate').textContent = formattedDate;
+
+    // Функция для подсчета суммы цифр
+    function sumDigits(str) {
+      return str.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+    }
+
+    // Рассчитываем технический расклад
+    function calculateTechnicalLayout(birthDate) {
+      // Убедимся, что дата передана в формате dd/mm/yyyy
+      const parts = birthDate.split('/');
+      if (parts.length !== 3) {
+        return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
+      }
+      
+      // Извлекаем день, месяц и год
+      const [day, month, year] = parts;
+
+      // Проверяем, что день, месяц и год - это числа
+      if (isNaN(day) || isNaN(month) || isNaN(year)) {
+        return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
+      }
+
+      const dateDigits = day + month + year; // Все цифры из даты рождения
+
+      // Первый технический расклад
+      const sumOfDigits = sumDigits(dateDigits);
+      const firstTechnical = sumDigits(sumOfDigits.toString()); // Сумма всех цифр
+
+      let firstDigitOfDay = 0;
+
+      // Второй технический расклад: если день меньше 10, берем вторую цифру
+      if (parseInt(day) < 10) {
+        firstDigitOfDay = parseInt(day[1]); // Вторая цифра
+      } else {
+        firstDigitOfDay = parseInt(day[0]); // Первая цифра
+      }
+
+      // Второй технический расклад
+      const secondTechnical = sumOfDigits - (firstDigitOfDay * 2);
+      const sumOfSecond = sumDigits(secondTechnical.toString());
+
+      return {
+        first: `${sumOfDigits}${firstTechnical}`,
+        second: `${secondTechnical}${sumOfSecond}`
+      };
+    }
+
+    // Расчитаем и отобразим технический расклад
+    const { first, second } = calculateTechnicalLayout(birthDate);
+    document.getElementById('technicalLayout').textContent = `${first} ${second}`;
+
+    function cntDigits(birthDate, fst, scnd) {
+      let parts = birthDate.split('/');
+      let allDigits = parts.join('') + fst.toString() + scnd.toString(); // Объединяем все части
+      console.log('Все цифры:', allDigits);
+
+      // Обход цифр от 1 до 9
+      for (let i = 1; i <= 9; i++) {
+        const count = allDigits.split('').filter(d => d === i.toString()).length;
+        const output = count > 0 ? i.toString().repeat(count) : '–';
+        console.log(`${i}: ${output}`);
+        // Если на странице есть элемент с id=i, можно вставить туда результат
+        const el = document.getElementById(i.toString());
+        if (el) el.textContent = output;
+      }
+    }
+    cntDigits(birthDate, first, second)
+
+</script>
+
+</body>
+</html>
