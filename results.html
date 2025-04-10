@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Результаты Матрицы</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header>
     <button onclick="goBack()">← Назад</button>
@@ -30,7 +32,7 @@
         <div class="label">Счастье</div>
         <div id="7" class="number">–</div>
       </div>
-    
+
       <!-- 2 5 8 -->
       <div class="cell">
         <div class="label">Энергия</div>
@@ -44,7 +46,7 @@
         <div class="label">Удача</div>
         <div id="8" class="number">–</div>
       </div>
-    
+
       <!-- 3 6 9 -->
       <div class="cell">
         <div class="label">Талант</div>
@@ -59,7 +61,7 @@
         <div id="9" class="number">–</div>
       </div>
     </div>
-    
+
   </main>
 
   <script>
@@ -81,40 +83,42 @@
 
     // Рассчитываем технический расклад
     function calculateTechnicalLayout(birthDate) {
-  const parts = birthDate.split('/');
-  if (parts.length !== 3) {
-    return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
-  }
+      const parts = birthDate.split('/');
+      if (parts.length !== 3) return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
 
-  const [day, month, year] = parts;
-  if (isNaN(day) || isNaN(month) || isNaN(year)) {
-    return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
-  }
+      const [day, month, year] = parts;
+      if (isNaN(day) || isNaN(month) || isNaN(year)) return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
 
-  const dateDigits = day + month + year;
+      const sumDigits = str => str.split('').reduce((acc, d) => acc + parseInt(d), 0);
 
-  const sumOfDigits = sumDigits(dateDigits);
-  const firstTechnical = sumDigits(sumOfDigits.toString());
+      const allDigits = (day + month + year).split('');
+      let sum = sumDigits(day + month + year); // Сумма всех цифр
 
-  let firstDigitOfDay = 0;
-  if (parseInt(day) < 10) {
-    firstDigitOfDay = parseInt(day[1]) || parseInt(day[0]); // защита от undefined
-  } else {
-    firstDigitOfDay = parseInt(day[0]);
-  }
+      // Если сумма < 10, добавляем 0 в строку
+      let baseSumStr = sum < 10 ? `${sum}0` : `${sum}`;
 
-  const secondTechnical = sumOfDigits - (firstDigitOfDay * 2);
-  const sumOfSecond = sumDigits(secondTechnical.toString());
+      // Считаем сумму цифр этой суммы
+      const sumOfBaseSum = sumDigits(baseSumStr); // напр. 2 из "20"
 
-  // Форматируем: если вторая сумма < 10, вставляем 0
-  const formattedFirst = firstTechnical < 10 ? `${sumOfDigits}0${firstTechnical}` : `${sumOfDigits}${firstTechnical}`;
-  const formattedSecond = sumOfSecond < 10 ? `${secondTechnical}0${sumOfSecond}` : `${secondTechnical}${sumOfSecond}`;
+      // Первая часть: 20 + 2 = "202"
+      const first = `${baseSumStr}${sumOfBaseSum}`;
 
-  return {
-    first: formattedFirst,
-    second: formattedSecond
-  };
-}
+      // Вторая часть:
+      let firstDigitOfDay = 0;
+      if (parseInt(day) < 10) {
+        firstDigitOfDay = parseInt(day[1]) || parseInt(day[0]); // Берем вторую цифру дня
+      } else {
+        firstDigitOfDay = parseInt(day[0]); // Иначе первую
+      }
+
+      let secondBase = Math.abs(sum - (firstDigitOfDay * 2));
+      let secondBaseStr = secondBase < 10 ? `${secondBase}0` : `${secondBase}`;
+      const sumOfSecondBase = sumDigits(secondBaseStr);
+
+      const second = `${secondBaseStr}${sumOfSecondBase}`;
+
+      return { first, second };
+    }
 
     // Расчитаем и отобразим технический расклад
     const { first, second } = calculateTechnicalLayout(birthDate);
@@ -137,7 +141,8 @@
     }
     cntDigits(birthDate, first, second)
 
-</script>
+  </script>
 
 </body>
+
 </html>
