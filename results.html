@@ -81,44 +81,40 @@
 
     // Рассчитываем технический расклад
     function calculateTechnicalLayout(birthDate) {
-      // Убедимся, что дата передана в формате dd/mm/yyyy
-      const parts = birthDate.split('/');
-      if (parts.length !== 3) {
-        return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
-      }
-      
-      // Извлекаем день, месяц и год
-      const [day, month, year] = parts;
+  const parts = birthDate.split('/');
+  if (parts.length !== 3) {
+    return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
+  }
 
-      // Проверяем, что день, месяц и год - это числа
-      if (isNaN(day) || isNaN(month) || isNaN(year)) {
-        return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
-      }
+  const [day, month, year] = parts;
+  if (isNaN(day) || isNaN(month) || isNaN(year)) {
+    return { first: 'Ошибка в дате', second: 'Ошибка в дате' };
+  }
 
-      const dateDigits = day + month + year; // Все цифры из даты рождения
+  const dateDigits = day + month + year;
 
-      // Первый технический расклад
-      const sumOfDigits = sumDigits(dateDigits);
-      const firstTechnical = sumDigits(sumOfDigits.toString()); // Сумма всех цифр
+  const sumOfDigits = sumDigits(dateDigits);
+  const firstTechnical = sumDigits(sumOfDigits.toString());
 
-      let firstDigitOfDay = 0;
+  let firstDigitOfDay = 0;
+  if (parseInt(day) < 10) {
+    firstDigitOfDay = parseInt(day[1]) || parseInt(day[0]); // защита от undefined
+  } else {
+    firstDigitOfDay = parseInt(day[0]);
+  }
 
-      // Второй технический расклад: если день меньше 10, берем вторую цифру
-      if (parseInt(day) < 10) {
-        firstDigitOfDay = parseInt(day[1]); // Вторая цифра
-      } else {
-        firstDigitOfDay = parseInt(day[0]); // Первая цифра
-      }
+  const secondTechnical = sumOfDigits - (firstDigitOfDay * 2);
+  const sumOfSecond = sumDigits(secondTechnical.toString());
 
-      // Второй технический расклад
-      const secondTechnical = sumOfDigits - (firstDigitOfDay * 2);
-      const sumOfSecond = sumDigits(secondTechnical.toString());
+  // Форматируем: если вторая сумма < 10, вставляем 0
+  const formattedFirst = firstTechnical < 10 ? `${sumOfDigits}0${firstTechnical}` : `${sumOfDigits}${firstTechnical}`;
+  const formattedSecond = sumOfSecond < 10 ? `${secondTechnical}0${sumOfSecond}` : `${secondTechnical}${sumOfSecond}`;
 
-      return {
-        first: `${sumOfDigits}${firstTechnical}`,
-        second: `${secondTechnical}${sumOfSecond}`
-      };
-    }
+  return {
+    first: formattedFirst,
+    second: formattedSecond
+  };
+}
 
     // Расчитаем и отобразим технический расклад
     const { first, second } = calculateTechnicalLayout(birthDate);
